@@ -135,19 +135,19 @@ export async function getrecentscore(id: number) {
     )
     .addFields({
       name: "Stats:",
-      value: `*Score:*     ${formattedScore}\n*Combo:*   ${
+      value: `\`Score:\`     ${formattedScore}\n\`Combo:\`     ${
         data.scores[0].max_combo
       }/${
         data.scores[0].beatmap.max_combo
-      }x\n*Mods:*     +${modsUsed}\n*Ranking:*   ${
+      }x\n\`Mods:\`      +${modsUsed}\n\`Ranking:\`   ${
         rankConversions[data.scores[0].grade]
-      }\n*Accuracy:*  ${data.scores[0].acc.toFixed(2)}%\n*Hits:*     (${
+      }\n\`Accuracy:\`   ${data.scores[0].acc.toFixed(2)}%\n\`Hits:\`      (${
         data.scores[0].n300
       }/${data.scores[0].n100}/${data.scores[0].n50}/${
         data.scores[0].nmiss
-      })\n\n*PP:*      ${
+      })\n\n\`PP:\`        ${
         data.scores[0].pp
-      } PP\n*if FC:*      ${ppdata.performance.pp.toFixed(2)} PP`,
+      } PP\n\`if FC:\`      ${ppdata.performance.pp.toFixed(2)} PP`,
     })
     .setFooter({
       text: `Standard beatmap by ${data.scores[0].beatmap.creator} played @ ${formattedTime} on ${formattedDate}`,
