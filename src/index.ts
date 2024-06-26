@@ -20,6 +20,10 @@ const client = new Client({
   ],
 });
 
+function isRealValue(obj: any) {
+  return obj && obj !== "null" && obj !== "undefined";
+}
+
 const mongoURI = `mongodb+srv://BlobBot:${config.MONGO_PASSWORD}@clusterdemo.rpspo.mongodb.net/?retryWrites=true&w=majority&appName=ClusterDemo`;
 
 const mongoClient = new MongoClient(mongoURI, {
@@ -52,13 +56,18 @@ client.on("messageCreate", async (message) => {
       await coll
         .findOne(query, { projection: projection })
         .then(async (res) => {
+          const exists = Object.is(res?.osuUser, undefined);
+          if (exists) {
+            return message.channel.send(
+              `No user hasn't been set with \`>setuser [user]\` or no longer exists`
+            );
+          }
           const embed = await getrecentscore(res!.osuUser);
           message.channel.send({ embeds: [embed] });
         });
     } catch (error) {
       console.log(error);
-      message.channel.send(`An error has occurred. Blame Pana`);
-      return;
+      return message.channel.send(`An error has occurred. Blame Pana`);
     }
   }
 });

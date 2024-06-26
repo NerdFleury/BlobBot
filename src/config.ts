@@ -9,6 +9,8 @@ const {
   MONGO_PASSWORD,
   GET_PLAYER_V1_API,
   GET_RECENT,
+  OSU_API,
+  V1_API,
 } = process.env;
 
 if (
@@ -17,7 +19,9 @@ if (
   !MONGO_PASSWORD ||
   !MONGO_USER ||
   !GET_PLAYER_V1_API ||
-  !GET_RECENT
+  !GET_RECENT ||
+  !OSU_API ||
+  !V1_API
 ) {
   throw new Error("Missing environment variables");
 }
@@ -29,4 +33,6 @@ export const config = {
   MONGO_PASSWORD,
   GET_PLAYER_V1_API,
   GET_RECENT,
+  OSU_API,
+  V1_API,
 };

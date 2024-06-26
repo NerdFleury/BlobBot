@@ -35,7 +35,7 @@ export async function setUser({
     return;
   }
 
-  const query = { discordUser: message.author };
+  const query = { discordUser: message.author.username };
 
   const data2 = {
     $set: {
