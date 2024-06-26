@@ -61,7 +61,7 @@ export async function getrecentscore(id: number) {
         data.scores[0].max_combo
       }/${
         data.scores[0].beatmap.max_combo
-      }x\n*Ranking:*   :regional_indicator_${data.scores[0].grade.toLowerCase()}:\n*Accuracy:*  ${data.scores[0].acc.toFixed(
+      }x\n*Ranking:*   :${data.scores[0].grade.toLowerCase()}_:\n*Accuracy:*  ${data.scores[0].acc.toFixed(
         2
       )}%\n*Hits:*     (${data.scores[0].n300}/${data.scores[0].n100}/${
         data.scores[0].n50
