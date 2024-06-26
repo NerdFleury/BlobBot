@@ -145,9 +145,9 @@ export async function getrecentscore(id: number) {
         data.scores[0].n300
       }/${data.scores[0].n100}/${data.scores[0].n50}/${
         data.scores[0].nmiss
-      })\n\n\`PP:\`        ${
-        data.scores[0].pp
-      } PP\n\`if FC:\`      ${ppdata.performance.pp.toFixed(2)} PP`,
+      })\n\n\`PP:\`        ${data.scores[0].pp.toFixed(
+        2
+      )} PP\n\`if FC:\`      ${ppdata.performance.pp.toFixed(2)} PP`,
     })
     .setFooter({
       text: `Standard beatmap by ${data.scores[0].beatmap.creator} played @ ${formattedTime} on ${formattedDate}`,
