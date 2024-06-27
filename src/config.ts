@@ -11,6 +11,7 @@ const {
   GET_RECENT,
   OSU_API,
   V1_API,
+  LEADERBOARD,
 } = process.env;
 
 if (
@@ -21,7 +22,8 @@ if (
   !GET_PLAYER_V1_API ||
   !GET_RECENT ||
   !OSU_API ||
-  !V1_API
+  !V1_API ||
+  !LEADERBOARD
 ) {
   throw new Error("Missing environment variables");
 }
@@ -35,4 +37,5 @@ export const config = {
   GET_RECENT,
   OSU_API,
   V1_API,
+  LEADERBOARD,
 };

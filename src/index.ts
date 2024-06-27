@@ -11,6 +11,7 @@ import { getrecentscore } from "./commands/recentscore";
 import { config } from "./config";
 import { MongoClient, ServerApiVersion } from "mongodb";
 import { setUser } from "./commands/setuser";
+import { GlobalLeaderboard } from "./commands/leaderboard";
 
 const client = new Client({
   intents: [
@@ -47,6 +48,18 @@ client.on("messageCreate", async (message) => {
 
   if (message.content.startsWith(">setuser")) {
     setUser({ message, coll });
+  }
+
+  if (
+    message.content.startsWith(">leaderboard") ||
+    message.content.startsWith(">lb")
+  ) {
+    try {
+      const leader = await GlobalLeaderboard();
+      message.channel.send({ embeds: [leader!] });
+    } catch {
+      return message.channel.send(`An error has occurred. Blame Pana`);
+    }
   }
 
   if (message.content === ">rs") {
