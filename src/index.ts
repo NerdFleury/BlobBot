@@ -6,10 +6,12 @@ import {
   Permissions,
   REST,
   Routes,
+  ActivityType,
 } from "discord.js";
 import { getrecentscore } from "./commands/recentscore";
 import { config } from "./config";
 import { MongoClient, ServerApiVersion } from "mongodb";
+import { pingIDToUser, usernameToUser } from "./util/osuDiscordUser";
 import { setUser } from "./commands/setuser";
 import { GlobalLeaderboard } from "./commands/leaderboard";
 
@@ -40,7 +42,9 @@ const coll = db.collection("data");
 
 client.on("ready", () => {
   console.log("Bot is ready");
-  client.user?.setActivity("Watching over Blobsu server");
+  client.user?.setActivity("over Blobsu server", {
+    type: ActivityType.Watching,
+  });
 });
 
 client.on("messageCreate", async (message) => {
@@ -62,25 +66,49 @@ client.on("messageCreate", async (message) => {
     }
   }
 
-  if (message.content === ">rs") {
-    const query = { discordUser: message.author.username };
-    const projection = { osuUser: 1 };
-    try {
-      await coll
-        .findOne(query, { projection: projection })
-        .then(async (res) => {
-          const exists = Object.is(res?.osuUser, undefined);
-          if (exists) {
-            return message.channel.send(
-              `No user hasn't been set with \`>setuser [user]\` or no longer exists`
-            );
-          }
-          const embed = await getrecentscore(res!.osuUser);
-          message.channel.send({ embeds: [embed] });
+  if (message.content.startsWith(">rs")) {
+    const msgArr = message.content.split(" ");
+    if (msgArr.length == 1) {
+      try {
+        const res = await usernameToUser(
+          message.author.username,
+          coll,
+          message
+        );
+        const embed = await getrecentscore({
+          value: res!.osuUser,
+          dataType: "id",
         });
-    } catch (error) {
-      console.log(error);
-      return message.channel.send(`An error has occurred. Blame Pana`);
+        message.channel.send({ embeds: [embed] });
+      } catch (error) {
+        console.log(error);
+        return message.channel.send(`An error has occurred. Blame Pana`);
+      }
+    } else if (msgArr.length == 2) {
+      if (!msgArr[1].startsWith("<@")) {
+        try {
+          const embed = await getrecentscore({
+            value: msgArr[1],
+            dataType: "name",
+          });
+          message.channel.send({ embeds: [embed] });
+        } catch (error) {
+          console.log(error);
+          return message.channel.send(`An error has occurred. Blame Pana`);
+        }
+      } else {
+        try {
+          const res = await pingIDToUser(msgArr[1], coll, message, client);
+          const embed = await getrecentscore({
+            value: res!.osuUser,
+            dataType: "id",
+          });
+          message.channel.send({ embeds: [embed] });
+        } catch (error) {
+          console.log(error);
+          return message.channel.send(`An error has occurred. Blame Pana`);
+        }
+      }
     }
   }
 });

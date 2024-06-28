@@ -1,6 +1,9 @@
 import { EmbedBuilder } from "discord.js";
 import { config } from "../config";
 import { calculatePp } from "../util/calculatepp";
+import { emotes } from "../assets/emotes";
+
+const rankConversions = emotes.rankings;
 
 function getMods(bitmask: number): string[] {
   const activeMods: string[] = [];
@@ -49,13 +52,22 @@ const MODS = {
   MR: 1 << 30,
 };
 
-export async function getrecentscore(id: number) {
-  const response = await fetch(`${config.GET_RECENT}/?scope=recent&id=${id}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-    },
-  });
+export async function getrecentscore({
+  value,
+  dataType,
+}: {
+  value: number | string;
+  dataType: "id" | "name";
+}) {
+  const response = await fetch(
+    `${config.GET_RECENT}/?scope=recent&${dataType}=${value}`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
   const data = await response.json();
 
   const calculate_pp = await calculatePp({
@@ -72,8 +84,6 @@ export async function getrecentscore(id: number) {
 
   const ppdata = await calculate_pp;
 
-  console.log(ppdata);
-
   if (data.scores.length == 0) {
     const embedrs = new EmbedBuilder()
       .setColor(0x008080)
@@ -84,33 +94,16 @@ export async function getrecentscore(id: number) {
   }
 
   const dateString = data.scores[0].play_time;
-
   const date = new Date(dateString);
-
   const hours = date.getHours();
   const minutes = date.getMinutes();
-
   const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes
     .toString()
     .padStart(2, "0")}`;
-
   const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Months are zero-indexed
   const day = date.getDate().toString().padStart(2, "0");
   const year = date.getFullYear();
-
   const formattedDate = `${month}/${day}/${year}`;
-
-  const rankConversions = {
-    XH: "<:XH_:1254833993799438470>",
-    X: "<:X_:1254833991740162088>",
-    SH: "<:SH_:1254833968801644576>",
-    S: "<:S_:1254833966603702312>",
-    A: "<:A_:1254833995686875187>",
-    B: "<:B_:1254833997977096293>",
-    C: "<:C_:1254834005472182303>",
-    D: "<:D_:1254834007867260998>",
-    F: "<:F_:1254834013831696424>",
-  };
 
   const modsUsed = getMods(data.scores[0].mods).join("");
 
