@@ -14,6 +14,14 @@ const client = new Client({
   ],
 });
 
+/*
+VANILLA_OSU = 0
+VANILLA_TAIKO = 1
+VANILLA_CATCH = 2
+VANILLA_MANIA = 3
+RELAX_OSU = 4
+*/
+
 function isRealValue(obj: any) {
   return obj && obj !== "null" && obj !== "undefined";
 }
