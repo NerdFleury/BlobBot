@@ -1,14 +1,5 @@
-import {
-  Client,
-  GatewayIntentBits,
-  EmbedBuilder,
-  PermissionsBitField,
-  Permissions,
-  REST,
-  Routes,
-  ActivityType,
-} from "discord.js";
-import { getrecentscore } from "./commands/recentscore";
+import { Client, GatewayIntentBits, ActivityType } from "discord.js";
+import { getrecentrxscore, getrecentscore } from "./commands/recentscore";
 import { config } from "./config";
 import { MongoClient, ServerApiVersion } from "mongodb";
 import { pingIDToUser, usernameToUser } from "./util/osuDiscordUser";
@@ -100,6 +91,54 @@ client.on("messageCreate", async (message) => {
         try {
           const res = await pingIDToUser(msgArr[1], coll, message, client);
           const embed = await getrecentscore({
+            value: res!.osuUser,
+            dataType: "id",
+          });
+          message.channel.send({ embeds: [embed] });
+        } catch (error) {
+          console.log(error);
+          return message.channel.send(`An error has occurred. Blame Pana`);
+        }
+      }
+    }
+  }
+
+  // Needs to be reformatted so that the function is parameterized
+
+  if (message.content.startsWith(">rx")) {
+    const msgArr = message.content.split(" ");
+    if (msgArr.length == 1) {
+      try {
+        const res = await usernameToUser(
+          message.author.username,
+          coll,
+          message
+        );
+        const embed = await getrecentrxscore({
+          value: res!.osuUser,
+          dataType: "id",
+        });
+        message.channel.send({ embeds: [embed] });
+      } catch (error) {
+        console.log(error);
+        return message.channel.send(`An error has occurred. Blame Pana`);
+      }
+    } else if (msgArr.length == 2) {
+      if (!msgArr[1].startsWith("<@")) {
+        try {
+          const embed = await getrecentrxscore({
+            value: msgArr[1],
+            dataType: "name",
+          });
+          message.channel.send({ embeds: [embed] });
+        } catch (error) {
+          console.log(error);
+          return message.channel.send(`An error has occurred. Blame Pana`);
+        }
+      } else {
+        try {
+          const res = await pingIDToUser(msgArr[1], coll, message, client);
+          const embed = await getrecentrxscore({
             value: res!.osuUser,
             dataType: "id",
           });

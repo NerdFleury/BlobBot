@@ -70,6 +70,15 @@ export async function getrecentscore({
   );
   const data = await response.json();
 
+  if (data.scores.length == 0) {
+    const embedrs = new EmbedBuilder()
+      .setColor(0x008080)
+      .setDescription(
+        `No recent scores found for user \`${data.player.name}\` on blobsu!.`
+      );
+    return embedrs;
+  }
+
   const calculate_pp = await calculatePp({
     beatmap_id: data.scores[0].beatmap.id,
     nkatu: data.scores[0].nkatu,
@@ -83,15 +92,6 @@ export async function getrecentscore({
   });
 
   const ppdata = await calculate_pp;
-
-  if (data.scores.length == 0) {
-    const embedrs = new EmbedBuilder()
-      .setColor(0x008080)
-      .setDescription(
-        `No recent scores found for user ${data.player.name} on blobsu.`
-      );
-    return embedrs;
-  }
 
   const dateString = data.scores[0].play_time;
   const date = new Date(dateString);
@@ -120,6 +120,103 @@ export async function getrecentscore({
     )
     .setAuthor({
       name: `Recent Blobsu Standard Play for ${data.player.name}`,
+      iconURL:
+        "https://cdn.discordapp.com/attachments/1255451784550285323/1255451948254101564/Untitled-1.png?ex=667d2e3d&is=667bdcbd&hm=288a84334511bfc4fde8f3b5e68d9b9a3156165b39094730e93ac7f759fe41c8&",
+    })
+    .setThumbnail(
+      `https://assets.ppy.sh/beatmaps/${data.scores[0].beatmap.set_id}/covers/list.jpg`
+    )
+    .addFields({
+      name: "Stats:",
+      value: `\`Score:\`     ${formattedScore}\n\`Combo:\`     ${
+        data.scores[0].max_combo
+      }/${
+        data.scores[0].beatmap.max_combo
+      }x\n\`Mods:\`      +${modsUsed}\n\`Ranking:\`   ${
+        rankConversions[data.scores[0].grade]
+      }\n\`Accuracy:\`   ${data.scores[0].acc.toFixed(2)}%\n\`Hits:\`      (${
+        data.scores[0].n300
+      }/${data.scores[0].n100}/${data.scores[0].n50}/${
+        data.scores[0].nmiss
+      })\n\n\`PP:\`        ${data.scores[0].pp.toFixed(
+        2
+      )} PP\n\`if FC:\`      ${ppdata.performance.pp.toFixed(2)} PP`,
+    })
+    .setFooter({
+      text: `Standard beatmap by ${data.scores[0].beatmap.creator} played @ ${formattedTime} on ${formattedDate}`,
+    });
+
+  return embedrs;
+}
+
+export async function getrecentrxscore({
+  value,
+  dataType,
+}: {
+  value: number | string;
+  dataType: "id" | "name";
+}) {
+  const response = await fetch(
+    `${config.GET_RECENT}/?scope=recent&${dataType}=${value}&mode=4`,
+    {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
+  const data = await response.json();
+
+  if (data.scores.length == 0) {
+    const embedrs = new EmbedBuilder()
+      .setColor(0x008080)
+      .setDescription(
+        `No recent scores found for user \`${data.player.name}\` on blobsu! relax.`
+      );
+    return embedrs;
+  }
+
+  const calculate_pp = await calculatePp({
+    beatmap_id: data.scores[0].beatmap.id,
+    nkatu: data.scores[0].nkatu,
+    ngeki: data.scores[0].ngeki,
+    n100: data.scores[0].n100,
+    n50: data.scores[0].n50,
+    misses: data.scores[0].nmiss,
+    mods: data.scores[0].mods,
+    mode: data.scores[0].mode,
+    combo: data.scores[0].beatmap.max_combo,
+  });
+
+  const ppdata = await calculate_pp;
+
+  const dateString = data.scores[0].play_time;
+  const date = new Date(dateString);
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  const formattedTime = `${hours.toString().padStart(2, "0")}:${minutes
+    .toString()
+    .padStart(2, "0")}`;
+  const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Months are zero-indexed
+  const day = date.getDate().toString().padStart(2, "0");
+  const year = date.getFullYear();
+  const formattedDate = `${month}/${day}/${year}`;
+
+  const modsUsed = getMods(data.scores[0].mods).join("");
+
+  const formattedScore = data.scores[0].score.toLocaleString("en-US");
+  const embedrs = new EmbedBuilder()
+    .setColor(0x008080)
+    .setTitle(
+      `${data.scores[0].beatmap.title} [${
+        data.scores[0].beatmap.version
+      }] [${ppdata.difficulty.stars.toFixed(2)}★]`
+    )
+    .setURL(
+      `https://osu.ppy.sh/beatmapsets/${data.scores[0].beatmap.set_id}#osu/${data.scores[0].beatmap.id}`
+    )
+    .setAuthor({
+      name: `Recent Blobsu Relax Play for ${data.player.name}`,
       iconURL:
         "https://cdn.discordapp.com/attachments/1255451784550285323/1255451948254101564/Untitled-1.png?ex=667d2e3d&is=667bdcbd&hm=288a84334511bfc4fde8f3b5e68d9b9a3156165b39094730e93ac7f759fe41c8&",
     })
